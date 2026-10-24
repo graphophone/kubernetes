@@ -97,8 +97,10 @@ metadata:
     app.kubernetes.io/version: 18.6.0
     helm.sh/chart: postgresql-18.12.15
 data:
-  init_dbs.sql: CREATE DATABASE auth_db; CREATE DATABASE identity_db; CREATE DATABASE
-    music_db; CREATE DATABASE social_db
+  init_dbs.sql: |
+    CREATE DATABASE identity_db;
+    CREATE DATABASE music_db;
+    CREATE DATABASE social_db
 
 ---
 # Source: postgresql/templates/primary/svc-headless.yaml

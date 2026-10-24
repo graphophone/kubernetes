@@ -46,7 +46,7 @@ spec:
           tcpSocket:
             port: 8080
           initialDelaySeconds: 15
-          periodSeconds: 5
+          periodSeconds: 30
         volumeMounts:
         - name: config-volume
           mountPath: /config/config.local.yaml

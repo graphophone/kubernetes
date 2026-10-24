@@ -157,7 +157,7 @@ spec:
           EOF
           aws s3api put-bucket-policy --bucket user-assets --policy file:///tmp/user-assets-policy.json --endpoint-url http://rustfs:9000
           
-          cat > /tmp/streaming-audio-policy.json <<'EOF'
+          cat > /tmp/hls-audio-policy.json <<'EOF'
           {
             "Version": "2012-10-17",
             "Statement": [
@@ -166,9 +166,9 @@ spec:
                 "Effect": "Allow",
                 "Principal": "*",
                 "Action": ["s3:GetObject"],
-                "Resource": ["arn:aws:s3:::streaming-audio/*"]
+                "Resource": ["arn:aws:s3:::hls-audio/*"]
               }
             ]
           }
           EOF
-          aws s3api put-bucket-policy --bucket streaming-audio --policy file:///tmp/streaming-audio-policy.json --endpoint-url http://rustfs:9000
+          aws s3api put-bucket-policy --bucket hls-audio --policy file:///tmp/hls-audio-policy.json --endpoint-url http://rustfs:9000
