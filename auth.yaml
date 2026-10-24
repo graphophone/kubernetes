@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth
+data:
+  config.local.yaml: |
+    redis:
+      host: redis-master
+      port: 6379
+      user: default
+      password: redis123
+    jwt:
+      secret: "my jwt secret"
+      expiration_time: 15min
+    refresh_token:
+      expiration_time: 168h
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth-container
+        image: graphophone-auth:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 5
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/config.local.yaml
+          subPath: config.local.yaml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: auth
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
