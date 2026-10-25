@@ -5,10 +5,12 @@ metadata:
 spec:
   selector:
     app: rustfs
+  type: LoadBalancer
   ports:
   - name: api
     port: 9000
     targetPort: 9000
+    nodePort: 30900
   - name: console
     port: 9001
     targetPort: 9001
@@ -51,6 +53,8 @@ spec:
         - name: RUSTFS_CONSOLE_ENABLE
           value: "true"
         - name: RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS
+          value: "*"
+        - name: RUSTFS_CORS_ALLOWED_ORIGINS
           value: "*"
         - name: RUSTFS_ACCESS_KEY
           value: "rustfsadmin"

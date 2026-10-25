@@ -15,6 +15,7 @@ data:
     access_key = "rustfsadmin"
     secret_key = "rustfsadmin"
     endpoint_url="http://rustfs:9000"
+    deployed_url = "http://localhost:9000"
     region="eu-west-1"
     assets_bucket = "user-assets"
 ---
@@ -38,13 +39,6 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "100m"
-          limits:
-            memory: "128Mi"
-            cpu: "200m"
         livenessProbe:
           tcpSocket:
             port: 8080
