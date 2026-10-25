@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: music-catalog
+data:
+  config.local.toml: |
+    [postgres]
+    host = "postgres"
+    port = 5432
+    user = "postgres"
+    password = "postgres123"
+    database = "music_db"
+
+    [rustfs]
+    access_key = "rustfsadmin"
+    secret_key = "rustfsadmin"
+    endpoint_url = "http://rustfs:9000"
+    region = "eu-west-1"
+    thumbnails_bucket = "thumbnails"
+    raw_audio_bucket = "raw-audio"
+    hls_audio_bucket = "hls-audio"
+
+    [rabbitmq]
+    addr = "amqp://admin:secure_password@rabbitmq:5672"
+    queue = "audio"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: music-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: music-catalog
+  template:
+    metadata:
+      labels:
+        app: music-catalog
+    spec:
+      containers:
+      - name: music-catalog-container
+        image: graphophone-music-catalog:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 30
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/config.local.toml
+          subPath: config.local.toml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: music-catalog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: music-catalog
+spec:
+  selector:
+    app: music-catalog
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
