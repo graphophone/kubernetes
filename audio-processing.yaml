@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audio-processing
+data:
+  config.local.toml: |
+    [rustfs]
+    access_key = "rustfsadmin"
+    secret_key = "rustfsadmin"
+    endpoint_url = "http://rustfs:9000"
+    region = "eu-west-1"
+    raw_audio_bucket = "raw-audio"
+    hls_audio_bucket = "hls-audio"
+
+    [music_catalog]
+    addr = "http://music-catalog:8080"
+
+    [rabbitmq]
+    addr = "amqp://admin:secure_password@rabbitmq:5672"
+    queue = "audio"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audio-processing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audio-processing
+  template:
+    metadata:
+      labels:
+        app: audio-processing
+    spec:
+      containers:
+      - name: audio-processing-container
+        image: graphophone-audio-processing:1.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/config.local.toml
+          subPath: config.local.toml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: audio-processing
