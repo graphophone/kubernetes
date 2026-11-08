@@ -29,6 +29,17 @@ spec:
       labels:
         app: auth
     spec:
+      initContainers:
+      - name: wait-for-dependencies
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z redis-master 6379; do
+            echo "Waiting for redis-master:6379..."
+            sleep 2
+          done
       containers:
       - name: auth-container
         image: graphophone-auth:1.0

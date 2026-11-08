@@ -28,6 +28,19 @@ spec:
       labels:
         app: backend-for-website
     spec:
+      initContainers:
+      - name: wait-for-dependencies
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          for dependency in identity:8080 auth:8080 music-catalog:8080 social:8080; do
+            until nc -z ${dependency%:*} ${dependency#*:}; do
+              echo "Waiting for ${dependency}..."
+              sleep 2
+            done
+          done
       containers:
       - name: backend-for-website-container
         image: graphophone-backend-for-website:1.0

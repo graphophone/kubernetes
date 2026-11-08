@@ -39,6 +39,19 @@ spec:
       labels:
         app: music-catalog
     spec:
+      initContainers:
+      - name: wait-for-dependencies
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          for dependency in postgres:5432 rustfs:9000 rabbitmq:5672; do
+            until nc -z ${dependency%:*} ${dependency#*:}; do
+              echo "Waiting for ${dependency}..."
+              sleep 2
+            done
+          done
       containers:
       - name: music-catalog-container
         image: graphophone-music-catalog:1.0
